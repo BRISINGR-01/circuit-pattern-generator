@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="shortcut icon" href="favicon.svg" type="image/x-icon" />
+		<title>Circuits pattern</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body,
+			html {
+				width: 100vw;
+				height: 100vh;
+				overflow: hidden;
+				background-color: black;
+			}
+			#canvas {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			.debug-point {
+				position: absolute;
+				width: 10px;
+				height: 10px;
+				background: rgba(0, 255, 0, 0);
+				border: 2px solid rgba(128, 128, 128, 0.204);
+				border-radius: 50%;
+				box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+				cursor: pointer;
+				z-index: 2;
+				transform: translate(-50%, -50%);
+			}
+
+			.debug-info {
+				position: absolute;
+				padding: 8px;
+				background: #222222e3;
+				color: #0f0;
+				font-size: 12px;
+				border-radius: 8px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+				white-space: pre-wrap;
+				display: none;
+				border: 2px solid gray;
+				width: max-content;
+				z-index: 3;
+			}
+
+			.btn {
+				background: #222222e3;
+				border: 2px solid #0f0;
+				padding: 5px;
+				border-radius: 10px;
+				position: absolute;
+				width: 2em;
+				height: 2em;
+				margin: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="play" class="btn" style="right: calc(2em + 10px)">
+			<svg
+				id="play-icon"
+				style="display: none"
+				viewBox="0 0 24 24"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+				stroke="#00ff00"
+			>
+				<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+				<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+				<g id="SVGRepo_iconCarrier">
+					<path
+						d="M16.6582 9.28638C18.098 10.1862 18.8178 10.6361 19.0647 11.2122C19.2803 11.7152 19.2803 12.2847 19.0647 12.7878C18.8178 13.3638 18.098 13.8137 16.6582 14.7136L9.896 18.94C8.29805 19.9387 7.49907 20.4381 6.83973 20.385C6.26501 20.3388 5.73818 20.0469 5.3944 19.584C5 19.053 5 18.1108 5 16.2264V7.77357C5 5.88919 5 4.94701 5.3944 4.41598C5.73818 3.9531 6.26501 3.66111 6.83973 3.6149C7.49907 3.5619 8.29805 4.06126 9.896 5.05998L16.6582 9.28638Z"
+						stroke="#0f0"
+						stroke-width="2"
+						stroke-linejoin="round"
+					></path>
+				</g>
+			</svg>
+			<svg id="pause-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+				<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+				<g id="SVGRepo_iconCarrier">
+					<path
+						d="M2 6C2 4.11438 2 3.17157 2.58579 2.58579C3.17157 2 4.11438 2 6 2C7.88562 2 8.82843 2 9.41421 2.58579C10 3.17157 10 4.11438 10 6V18C10 19.8856 10 20.8284 9.41421 21.4142C8.82843 22 7.88562 22 6 22C4.11438 22 3.17157 22 2.58579 21.4142C2 20.8284 2 19.8856 2 18V6Z"
+						stroke="#0f0"
+						stroke-width="1.5"
+					></path>
+					<path
+						d="M14 6C14 4.11438 14 3.17157 14.5858 2.58579C15.1716 2 16.1144 2 18 2C19.8856 2 20.8284 2 21.4142 2.58579C22 3.17157 22 4.11438 22 6V18C22 19.8856 22 20.8284 21.4142 21.4142C20.8284 22 19.8856 22 18 22C16.1144 22 15.1716 22 14.5858 21.4142C14 20.8284 14 19.8856 14 18V6Z"
+						stroke="#0f0"
+						stroke-width="1.5"
+					></path>
+				</g>
+			</svg>
+		</div>
+		<div id="next" class="btn" style="right: 0">
+			<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+				<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+				<g id="SVGRepo_iconCarrier">
+					<path
+						fill-rule="evenodd"
+						clip-rule="evenodd"
+						d="M5.60439 4.23093C4.94586 3.73136 4 4.20105 4 5.02762V18.9724C4 19.799 4.94586 20.2686 5.60439 19.7691L14.7952 12.7967C15.3227 12.3965 15.3227 11.6035 14.7952 11.2033L5.60439 4.23093ZM2 5.02762C2 2.54789 4.83758 1.13883 6.81316 2.63755L16.004 9.60993C17.5865 10.8104 17.5865 13.1896 16.004 14.3901L6.81316 21.3625C4.83758 22.8612 2 21.4521 2 18.9724V5.02762Z"
+						fill="#0f0"
+					></path>
+					<path
+						d="M20 3C20 2.44772 20.4477 2 21 2C21.5523 2 22 2.44772 22 3V21C22 21.5523 21.5523 22 21 22C20.4477 22 20 21.5523 20 21V3Z"
+						fill="#0f0"
+					></path>
+				</g>
+			</svg>
+		</div>
+
+		<canvas id="canvas"></canvas>
+		<script type="module">
+			import { example } from "./src/html-canvas-interface.ts";
+
+			example();
+		</script>
+	</body>
+</html>
