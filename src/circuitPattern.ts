@@ -17,7 +17,7 @@ export enum Action {
 }
 const totalAmountOfActions = Object.keys(Action).length;
 
-export type Segment = { action: Action; direction: Direction; start: Position; end: Position };
+export type Segment = { action: Action; direction: Direction; start: Position; end: Position; level: number };
 
 export class Position {
 	constructor(public x: number, public y: number) {}
@@ -100,7 +100,10 @@ function tableWithout<T extends ProbabilityTable>(removedProperty: keyof T, tabl
 type CircuitNode = {
 	position: Position;
 	direction: Direction;
+	level: number;
 };
+
+const CONSTANTS = {};
 
 export default class CircuitPatternGenerator {
 	private nodes: CircuitNode[];
@@ -115,6 +118,7 @@ export default class CircuitPatternGenerator {
 			[Direction.Up, Direction.Right, Direction.Down, Direction.Left].map<CircuitNode>((direction) => ({
 				position: new Position(0, 0),
 				direction,
+				level: 0,
 			}));
 
 		Debug.reset();
@@ -134,10 +138,11 @@ export default class CircuitPatternGenerator {
 					direction: node.direction,
 					start: node.position,
 					end: nextPos,
+					level: node.level,
 				});
 
 				if (action != Action.End) {
-					const newNode = { position: nextPos, direction: node.direction };
+					const newNode = { ...node, position: nextPos, level: node.level + 1 };
 
 					Debug.addToLast({
 						nextNode: {
@@ -173,7 +178,7 @@ export default class CircuitPatternGenerator {
 		const isFirstLevel = node.position.y === 0;
 		const levelProgress = this.calculateProgress(node);
 
-		const splitChance = 0.65;
+		const splitChance = 1;
 		// const splitChance = Math.max(0.0002, Math.sin(Math.PI / 3 / (node.position.y || 1)));
 
 		const splitStrategy = chooseFromProbTable({

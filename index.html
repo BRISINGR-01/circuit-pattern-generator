@@ -6,6 +6,11 @@
 		<link rel="shortcut icon" href="favicon.svg" type="image/x-icon" />
 		<title>Circuits pattern</title>
 		<style>
+			:root {
+				--bg: "black";
+				--circuitColor: #0f0;
+			}
+
 			* {
 				margin: 0;
 				padding: 0;
@@ -17,7 +22,7 @@
 				width: 100vw;
 				height: 100vh;
 				overflow: hidden;
-				background-color: black;
+				background-color: var(--bg);
 			}
 			#canvas {
 				display: block;
@@ -42,7 +47,7 @@
 				position: absolute;
 				padding: 8px;
 				background: #222222e3;
-				color: #0f0;
+				color: var(--circuitColor);
 				font-size: 12px;
 				border-radius: 8px;
 				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
@@ -66,7 +71,7 @@
 		</style>
 	</head>
 	<body>
-		<div id="play" class="btn" style="right: calc(2em + 10px)">
+		<div id="play" class="btn" style="left: calc(2em + 10px)">
 			<svg
 				id="play-icon"
 				style="display: none"
@@ -103,7 +108,7 @@
 				</g>
 			</svg>
 		</div>
-		<div id="next" class="btn" style="right: 0">
+		<div id="next" class="btn" style="left: 0">
 			<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
 				<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -124,7 +129,7 @@
 
 		<canvas id="canvas"></canvas>
 		<script type="module">
-			import { example } from "./src/html-canvas-interface.ts";
+			import { example } from "./src/canvas-interface/html-canvas-interface.ts";
 
 			example();
 		</script>

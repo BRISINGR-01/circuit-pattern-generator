@@ -17,6 +17,12 @@ export default class Debug {
 			}
 		}
 	}
+
+	static removeDebugPoints() {
+		[...document.getElementsByClassName("debug-point"), ...document.getElementsByClassName("debug-info")].forEach(
+			(el) => el.parentElement!.removeChild(el)
+		);
+	}
 }
 
 export function ensureVisible(element: HTMLElement) {
