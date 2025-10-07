@@ -103,19 +103,24 @@ export class CircuitsPatternCanvasAPI {
 
 			for (let i = 0; i < this.sessions.length; i++) {
 				const session = this.sessions[i];
+
 				if (session.completedSegments.length === 0) {
 					// TODO remove session
+					console.log(session);
 				}
+
+				console.log(session);
 
 				session.completedSegments.push(...session.segments);
 				session.segments = session.patternGenerator.next().map((s) => this.canvasSegmentFromPattern(s));
 			}
 
 			if (
-				this.waveLength &&
-				this.sessions.at(-1)?.segments &&
-				this.sessions.at(-1)!.segments.length !== 0 &&
-				this.sessions.at(-1)!.segments[0].level > this.waveLength + this.waveGap
+				this.sessions.length === 0 ||
+				(this.waveLength &&
+					this.sessions.at(-1)?.segments &&
+					this.sessions.at(-1)!.segments.length !== 0 &&
+					this.sessions.at(-1)!.segments[0].level > this.waveLength + this.waveGap)
 			) {
 				this.addSession();
 			}
@@ -138,10 +143,12 @@ export class CircuitsPatternCanvasAPI {
 		for (const session of this.sessions) {
 			const currentLevel = session.segments[0]?.level;
 			if (currentLevel == undefined) continue;
-			let lastLevel = this.waveLength ? currentLevel - this.waveLength : -1;
+			const lastLevel = this.waveLength ? currentLevel - this.waveLength : -1;
 
 			for (const segment of session.completedSegments) {
-				if (lastLevel > segment.level) continue;
+				if (lastLevel > segment.level) {
+					console.log(session.completedSegments.indexOf(segment));
+				}
 
 				const isDisapearing = lastLevel === segment.level;
 

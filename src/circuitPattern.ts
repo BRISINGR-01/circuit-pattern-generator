@@ -103,8 +103,6 @@ type CircuitNode = {
 	level: number;
 };
 
-const CONSTANTS = {};
-
 export default class CircuitPatternGenerator {
 	private nodes: CircuitNode[];
 	private nextNodes: CircuitNode[] = [];
@@ -289,6 +287,6 @@ function isActionAllowed(action: Action, currentNode: CircuitNode, allNodes: Cir
 		if (node.position.y !== nextPos.y) continue;
 		if (node.position.x === nextPos.x) return false;
 	}
-	isActionAllowed;
+
 	return true;
 }

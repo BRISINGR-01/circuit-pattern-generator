@@ -1,6 +1,5 @@
 import Debug from "../Debug";
 import { CircuitsPatternCanvasAPI } from "./CircuitsPatternCanvasAPI";
-import { initGUI } from "./gui";
 import { DEFAULTS, type CanvasProps } from "./utils";
 
 let circuit: CircuitsPatternCanvasAPI;
@@ -22,7 +21,11 @@ export function animateCircuit(id: string, props?: CanvasProps) {
 	circuit = new CircuitsPatternCanvasAPI(canvas, props ?? DEFAULTS);
 	circuit.start();
 
-	if (props?.guiEnabled) initGUI({ ...DEFAULTS, waveLength: 0 }, circuit);
+	if (props?.guiEnabled) {
+		import("./gui").then((gui) => {
+			gui.initGUI({ ...DEFAULTS, waveLength: 0 }, circuit);
+		});
+	}
 
 	window.addEventListener("resize", () => {
 		canvas.width = window.innerWidth;
@@ -47,10 +50,10 @@ export function example() {
 	});
 }
 
-document.getElementById("next")!.addEventListener("click", () => {
+document.getElementById("next")?.addEventListener("click", () => {
 	circuit.nextOne();
 });
-document.getElementById("play")!.addEventListener("click", () => {
+document.getElementById("play")?.addEventListener("click", () => {
 	if (circuit.isRunning) {
 		circuit.stop();
 		document.getElementById("play-icon")!.style.display = "block";
