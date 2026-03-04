@@ -7,7 +7,7 @@ export const DEFAULTS = {
 	circuitColor: "green",
 	bgColor: "black",
 	strokeWidth: 1,
-	cellSize: Math.max(window.innerWidth, window.innerHeight) / 20,
+	cellSize: Math.max(window.innerWidth, window.innerHeight) / 25,
 	waveGap: 1,
 	waveLength: 2,
 	debugEnabled: false,

@@ -44,10 +44,13 @@ export function example() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 
-	animateCircuit("canvas", {
-		waveGap: 3,
-		waveLength: 3,
-	});
+	setTimeout(() => {
+		animateCircuit("canvas", {
+			waveGap: 4,
+			waveLength: 4,
+			speed: 3,
+		});
+	}, 2000);
 }
 
 document.getElementById("next")?.addEventListener("click", () => {

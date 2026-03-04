@@ -104,25 +104,20 @@ export class CircuitsPatternCanvasAPI {
 			for (let i = 0; i < this.sessions.length; i++) {
 				const session = this.sessions[i];
 
-				if (session.completedSegments.length === 0) {
-					// TODO remove session
-					console.log(session);
+				if (session.segments.length === 0 && session.completedSegments.length === 0) {
+					this.sessions.splice(i, 1);
+				} else {
+					this.updateSession(session);
 				}
-
-				console.log(session);
-
-				session.completedSegments.push(...session.segments);
-				session.segments = session.patternGenerator.next().map((s) => this.canvasSegmentFromPattern(s));
 			}
 
 			if (
 				this.sessions.length === 0 ||
 				(this.waveLength &&
-					this.sessions.at(-1)?.segments &&
 					this.sessions.at(-1)!.segments.length !== 0 &&
 					this.sessions.at(-1)!.segments[0].level > this.waveLength + this.waveGap)
 			) {
-				this.addSession();
+				// this.addSession();
 			}
 
 			if (Debug.isEnabled) {
@@ -137,26 +132,42 @@ export class CircuitsPatternCanvasAPI {
 		this.animProgress = this.currentFrame / this.nrOfFrames;
 	}
 
+	private updateSession(session: Session) {
+		const lastCompletedSegmentLevel = session.completedSegments[0]?.level;
+		const isFinalLevel = lastCompletedSegmentLevel === session.completedSegments.at(-1)?.level;
+
+		if (this.waveLength && !isFinalLevel) {
+			const currentLevel = session.segments[0]?.level;
+			const lastLevel = this.waveLength && currentLevel ? currentLevel - this.waveLength : null;
+
+			for (let i = 0; i < session.completedSegments.length; i++) {
+				if ((lastLevel ?? lastCompletedSegmentLevel) >= session.completedSegments[i].level) {
+					session.completedSegments.splice(i, 1);
+					i--;
+				}
+			}
+		}
+
+		session.completedSegments.push(...session.segments);
+		session.segments = session.patternGenerator.next().map((s) => this.canvasSegmentFromPattern(s));
+	}
+
 	draw() {
 		this.ctx.fillRect(0, 0, this.width, this.height);
 
 		for (const session of this.sessions) {
-			const currentLevel = session.segments[0]?.level;
-			if (currentLevel == undefined) continue;
-			const lastLevel = this.waveLength ? currentLevel - this.waveLength : -1;
-
-			for (const segment of session.completedSegments) {
-				if (lastLevel > segment.level) {
-					console.log(session.completedSegments.indexOf(segment));
-				}
-
-				const isDisapearing = lastLevel === segment.level;
-
-				segment.draw(isDisapearing ? this.animProgress : 1, this.ctx, this.drawCursor, isDisapearing);
-			}
-
 			for (const segment of session.segments) {
 				segment.draw(this.animProgress, this.ctx, this.drawCursor);
+			}
+
+			const currentLevel = session.segments[0]?.level;
+			const lastLevel = this.waveLength && currentLevel ? currentLevel - this.waveLength : null;
+			const lastCompletedSegmentLevel = session.completedSegments[0]?.level;
+
+			for (const segment of session.completedSegments) {
+				const isDisapearing = (lastLevel ?? lastCompletedSegmentLevel) === segment.level;
+
+				segment.draw(isDisapearing ? this.animProgress : 1, this.ctx, this.drawCursor, isDisapearing);
 			}
 		}
 	}
